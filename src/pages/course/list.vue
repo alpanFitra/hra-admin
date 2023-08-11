@@ -51,6 +51,7 @@ const submitForm: any = async () => {
   }
 }
 
+
 const showDetail = async (course: any) => {
   const store = useCourseDetail();
   await store.setDetailCourse(course.value, course.title, course.category);
@@ -95,7 +96,7 @@ const headers = [
                 <VRow>
                   <VCol cols="12">
                     <AppTextField v-model="courseName" label="Title" />
-                    <AppTextField v-model="courseCategory" label="Title" />
+                    <AppTextField v-model="courseCategory" label="Category" />
                   </VCol>
                 </VRow>
               </VCardText>
