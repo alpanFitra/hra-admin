@@ -9,7 +9,7 @@ const courses = ref([
 ])
 
 const isFormAddVisible = ref(false)
-const formTitle = ref('Add Category')
+const formTitle = ref('Add Course')
 const courseName = ref('')
 const courseCategory = ref('')
 const isSubmit = ref(false)
