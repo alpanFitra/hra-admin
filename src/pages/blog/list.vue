@@ -7,6 +7,7 @@ import { useBlogDetail } from '../../store/blogDetail';
 const headers = [
   { title: 'NO', sortable: false, key: 'no' },
   { title: 'TITLE', key: 'title' },
+  { title: 'CATEGORY', key: 'category' },
   { title: 'ACTION', key: 'action' },
 ]
 
