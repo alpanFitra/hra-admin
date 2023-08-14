@@ -14,11 +14,12 @@ const checkoutSteps = [
 ]
 
 const blogData = ref<BlogData>({
-  name: '',
-  email: '',
-  date: '',
-  experience: '',
-  age: '',
+  title: '',
+  description: '',
+  category: {
+    text: 'Choose Category',
+    value: 0,
+  },
 })
 
 const currentStep = ref(0)
