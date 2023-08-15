@@ -1,8 +1,11 @@
 export interface BlogData {
   id: number
-  name: string
-  email: string
-  date: date
-  experience: string
-  age: number
+  title: string
+  description: string
+  category: Category
+}
+
+export interface Category {
+  text: string
+  value: number
 }
