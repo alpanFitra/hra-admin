@@ -20,7 +20,7 @@ const blog = ref(props.blogData)
 const submitBlog = async () => {
   const formData = new FormData()
   formData.append('status', '1')
-  const response = await axios.patch('/blogs/blog/create', formData)
+  const response = await axios.patch('/blogs/blog/update/kenapa-transformasi-sdm-penting-bagi-kesuksesan-bisnis', formData)
 
   if (response) {
     window.location.href = '/'
