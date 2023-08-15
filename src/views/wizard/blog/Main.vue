@@ -11,7 +11,7 @@ interface Props {
 }
 interface Emit {
   (e: 'update:currentStep', value: number): void
-  (e: 'update:blog-data', value: blogData): void
+  (e: 'update:blog-data', value: BlogData): void
 }
 
 const props = defineProps<Props>()
@@ -62,11 +62,6 @@ const formatToFormData = (data: any) => {
     // if key == category, then we need to get the value    
     if (key === 'category') {
       formData.append('categoryId', data[key].value)
-    } else if (key === 'thumbnail' || key === 'hero_img') {
-      // Handle file inputs separately
-      if (data[key] instanceof File) {
-        formData.append(key, data[key])
-      }
     } else {
       formData.append(key, data[key])
     }
@@ -88,7 +83,7 @@ const submitForm = async () => {
     // set course data id
     blog.value.id = response.data.blogId
   } catch (error) {
-    console.error("Error uploading course:", error);
+    console.error("Error uploading blog:", error);
   }
 }
 
