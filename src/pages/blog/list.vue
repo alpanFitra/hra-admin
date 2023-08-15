@@ -17,6 +17,11 @@ interface BlogData {
   title: string;
   action: string;
 }
+
+const blog = ref([
+  { no: 0, title: '', category: '', action: '' },
+])
+
 const data = ref<BlogData[]>([])
 
 const isFormAddVisible = ref(false)
@@ -33,7 +38,7 @@ const getBlog = async () => {
         itemsPerPage: 5
       }
     })
-    response.data.categories.forEach((item: any, index: number) => {
+    response.data.blog.forEach((item: any, index: number) => {
       data.value.push({
         no: index + 1,
         id: item.id,
