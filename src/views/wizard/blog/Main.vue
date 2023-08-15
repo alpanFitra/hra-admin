@@ -19,40 +19,110 @@ const emit = defineEmits<Emit>()
 
 const blog = ref(<BlogData>{
   id: 0,
-  name: '',
-  email: '',
-  date: '',
-  experience: '',
-  age: '',
+  title: '',
+  description: '',
+  category: {
+    text: 'Choose Category',
+    value: 0,
+  },
 });
+const categories = [
+  {
+    text: 'Category 1',
+    value: 1,
+  },
+]
+
+const editorOptions = {
+  modules: {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+      ['blockquote', 'code-block'],
+      [{ header: 1 }, { header: 2 }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      [{ script: 'sub' }, { script: 'super' }],
+      [{ indent: '-1' }, { indent: '+1' }],
+      [{ direction: 'rtl' }],
+      [{ size: ['small', false, 'large', 'huge'] }],
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      [{ color: [] }, { background: [] }],
+      [{ align: [] }],
+    ],
+  },
+  placeholder: 'Write your course description here...',
+  theme: 'snow',
+}
+const updateDescription = (value: any) => {
+  blog.value.description = value.target.innerHTML
+}
+
+const formatToFormData = (data: any) => {
+  const formData = new FormData()
+  Object.keys(data).forEach((key) => {
+    // if key == category, then we need to get the value    
+    if (key === 'category') {
+      formData.append('categoryId', data[key].value)
+    } else if (key === 'thumbnail' || key === 'hero_img') {
+      // Handle file inputs separately
+      if (data[key] instanceof File) {
+        formData.append(key, data[key])
+      }
+    } else {
+      formData.append(key, data[key])
+    }
+  })
+  return formData
+}
+
+const submitForm = async () => {
+  try {
+    const formData = formatToFormData(blog.value)
+    formData.append('status', '1')
+
+    const response = await axios.post('/blogs/blog/create', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+
+    // set course data id
+    blog.value.id = response.data.blogId
+  } catch (error) {
+    console.error("Error uploading course:", error);
+  }
+}
+
+const updateBlogData = () => {
+  emit('update:blog-data', blog.value)
+}
+
+const nextStep = () => {
+  submitForm()
+  updateBlogData()
+  emit('update:currentStep', 1)
+}
+
+watch(() => blog.value, () => {
+  updateBlogData()
+})
 </script>
 
 <template>
   <VForm class="px-5 py-5">
     <VRow>
       <VCol md="6" sm="12">
-        <AppTextField prepend-inner-icon="tabler-certificate" v-model="blog.name" label="Name"
+        <AppTextField prepend-inner-icon="tabler-certificate" v-model="blog.title" label="Title"
           placeholder="Name" />
       </VCol>
 
       <VCol md="6" sm="12">
-        <AppTextField prepend-inner-icon="tabler-certificate" v-model="blog.email" label="Email"
-          placeholder="Email" />
+        <AppSelect v-model="blog.category" :items="categories" item-title="text" item-value="value" label="Categories"
+          persistent-hint return-object single-line />
       </VCol>
 
-      <VCol md="6" sm="12">
-        <AppTextField prepend-inner-icon="tabler-ankh" v-model="blog.date" label="Date"
-          placeholder="Date" />
-      </VCol>
-
-      <VCol md="6" sm="12">
-        <AppTextField prepend-inner-icon="tabler-brand-cashapp" v-model="blog.experience" label="Experience"
-          placeholder="Experience" />
-      </VCol>
-
-      <VCol md="6" sm="12">
-        <AppTextField prepend-inner-icon="tabler-brand-cashapp" v-model="blog.age" label="Age"
-          placeholder="Age" />
+      <VCol cols="12">
+        <label for="description">Description</label>
+        <QuillEditor @input="updateDescription" :options="editorOptions" style="height: auto" />
       </VCol>
 
       <VCol cols="12 text-end">
