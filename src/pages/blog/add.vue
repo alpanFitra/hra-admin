@@ -1,16 +1,11 @@
 <script setup lang="ts">
 import Main from '@/views/wizard/blog/Main.vue'
-import ConfirmationContent from '@/views/wizard/blog/Confirmation.vue'
 import type { BlogData } from '@/views/wizard/blog/types'
 
 const checkoutSteps = [
   {
     title: 'General',
     icon: 'custom-address',
-  },
-  {
-    title: 'Confirmation',
-    icon: 'custom-trending',
   },
 ]
 
@@ -42,10 +37,6 @@ const currentStep = ref(0)
         <VWindow v-model="currentStep" class="disable-tab-transition">
           <VWindowItem>
             <Main v-model:current-step="currentStep" v-model:course-data="blogData" />
-          </VWindowItem>
-
-          <VWindowItem>
-            <ConfirmationContent v-model:course-data="blogData" />
           </VWindowItem>
 
         </VWindow>
