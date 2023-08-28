@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import axios from '../../plugins/axios';
 import { VDataTable } from 'vuetify/labs/VDataTable';
+import axios from '../../plugins/axios';
 import { useBlogDetail } from '../../store/blogDetail';
 
 const headers = [
@@ -15,6 +15,7 @@ interface BlogData {
   no: number;
   id: number;
   title: string;
+  category: string;
   action: string;
 }
 
@@ -32,17 +33,18 @@ const isSubmit = ref(false)
 
 const getBlog = async () => {
   try {
-    const response = await axios.get('blogs/blog/all/', {
+    const response = await axios.get('/blog', {
       params: {
         page: 1,
         itemsPerPage: 5
       }
     })
-    response.data.blog.forEach((item: any, index: number) => {
+    response.data.forEach((item: any, index: number) => {
       data.value.push({
         no: index + 1,
         id: item.id,
-        title: item.name,
+        title: item.title,
+        category: item.category,
         action: item
       })
     })
@@ -60,7 +62,7 @@ const submitForm: any = async () => {
   }
 
   try {
-    const response = await axios.post('/blogs/blog/create', payload)
+    const response = await axios.post('/blog/create', payload)
     // console.log(response)
   } catch (error) {
     console.log(error)
@@ -71,7 +73,7 @@ const submitForm: any = async () => {
 
 const showDetail = async (item: any) => {
   const store = useBlogDetail();
-  await store.setDetailBlog(item.value, item.title,item.category);
+  await store.setDetailBlog(item.value, item.title, item.category);
 
   isFormAddVisible.value = true;
 
