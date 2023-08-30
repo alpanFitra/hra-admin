@@ -18,7 +18,6 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emit>()
 
 const blog = ref(<BlogData>{
-  id: 0,
   title: '',
   description: '',
   category: {
@@ -26,6 +25,7 @@ const blog = ref(<BlogData>{
     value: 0,
   },
 });
+
 const categories = [
   {
     text: 'Category 1',
@@ -52,36 +52,26 @@ const editorOptions = {
   placeholder: 'Write your course description here...',
   theme: 'snow',
 }
+
 const updateDescription = (value: any) => {
   blog.value.description = value.target.innerHTML
 }
 
-const formatToFormData = (data: any) => {
-  const formData = new FormData()
-  Object.keys(data).forEach((key) => {
-    // if key == category, then we need to get the value    
-    if (key === 'category') {
-      formData.append('categoryId', data[key].value)
-    } else {
-      formData.append(key, data[key])
-    }
-  })
-  return formData
-}
-
 const submitForm = async () => {
   try {
-    const formData = formatToFormData(blog.value)
-    formData.append('status', '1')
+    // formData.append('status', 'published')
 
-    const response = await axios.post('/blogs/blog/create', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+    const response = await axios.post('/blog/create', {
+      title: blog.value.title,
+      categoryId: 1,
+      description: blog.value.description,
+      status: 'published'
     })
-
     // set course data id
     blog.value.id = response.data.blogId
+    if (response) {
+      window.location.href = '/blog/list'
+    }
   } catch (error) {
     console.error("Error uploading blog:", error);
   }
@@ -106,8 +96,7 @@ watch(() => blog.value, () => {
   <VForm class="px-5 py-5">
     <VRow>
       <VCol md="6" sm="12">
-        <AppTextField prepend-inner-icon="tabler-certificate" v-model="blog.title" label="Title"
-          placeholder="Name" />
+        <AppTextField prepend-inner-icon="tabler-certificate" v-model="blog.title" label="Title" placeholder="Name" />
       </VCol>
 
       <VCol md="6" sm="12">
@@ -121,7 +110,7 @@ watch(() => blog.value, () => {
       </VCol>
 
       <VCol cols="12 text-end">
-        <VBtn type="button" @click="nextStep">Next</VBtn>
+        <VBtn type="button" @click="nextStep">simpan</VBtn>
       </VCol>
     </VRow>
   </VForm>
