@@ -8,6 +8,7 @@ const headers = [
   { title: 'NO', sortable: false, key: 'no' },
   { title: 'TITLE', key: 'title' },
   { title: 'CATEGORY', key: 'category' },
+  { title: 'DESCRIPTION', key: 'description' },
   { title: 'ACTION', key: 'action' },
 ]
 
@@ -16,6 +17,7 @@ interface BlogData {
   id: number;
   title: string;
   category: string;
+  description: string;
   action: string;
 }
 
@@ -27,9 +29,12 @@ const data = ref<BlogData[]>([])
 
 const isFormAddVisible = ref(false)
 const formTitle = ref('Add Blog')
-const blogCategory = ref('')
 const blogName = ref('')
+const blogCategory = ref('')
+const blogSlug = ref('')
+const blogDescription = ref('')
 const isSubmit = ref(false)
+const isUpdate = ref(false)
 
 const getBlog = async () => {
   try {
@@ -45,7 +50,8 @@ const getBlog = async () => {
         id: item.id,
         title: item.title,
         category: item.category,
-        action: item
+        description: item.description,
+        action: item.slug
       })
     })
   } catch (error) {
@@ -53,27 +59,46 @@ const getBlog = async () => {
   }
 }
 
-const submitForm: any = async () => {
+const updateForm: any = async () => {
   isFormAddVisible.value = false
   isSubmit.value = true
 
   const payload = {
-    name: blogName.value
+    title: blogName.value,
+    category: blogCategory.value,
+    description: blogDescription.value
   }
 
   try {
-    const response = await axios.post('/blog/create', payload)
+    const response = await axios.patch(`/blog/update/${blogSlug.value}`, payload)
+    if (response) {
+      window.location.href = '/blog/list'
+    }
     // console.log(response)
   } catch (error) {
     console.log(error)
   } finally {
     isSubmit.value = false
+    isUpdate.value = false
   }
+}
+
+const deleteCol: any = async (param: any) => {
+  try {
+    // console.log(param.columns.action)
+    const response = await axios.patch('/blog/delete/' + param.columns.action)
+    if(response){
+      window.location.href = '/blog/list'
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
 }
 
 const showDetail = async (item: any) => {
   const store = useBlogDetail();
-  await store.setDetailBlog(item.value, item.title, item.category);
+  await store.setDetailBlog(item.value, item.title, item.category, item.description);
 
   isFormAddVisible.value = true;
 
@@ -83,6 +108,10 @@ const showDetail = async (item: any) => {
   // passing data to form
   blogName.value = item.title;
   blogCategory.value = item.category;
+  blogDescription.value = item.description;
+
+  isUpdate.value = true
+  blogSlug.value = item.columns.action
 };
 
 onMounted(() => {
@@ -112,7 +141,8 @@ onMounted(() => {
                 <VRow>
                   <VCol cols="12">
                     <AppTextField v-model="blogName" label="Title" />
-                    <AppTextField v-model="blogCategory" label="Category" />
+                    <AppSelect v-model="blogCategory" label="Category" />
+                    <AppTextarea v-model="blogDescription" label="Description" />
                   </VCol>
                 </VRow>
               </VCardText>
@@ -121,7 +151,7 @@ onMounted(() => {
                 <VBtn variant="tonal" color="secondary" @click="isFormAddVisible = false">
                   Close
                 </VBtn>
-                <VBtn @click="submitForm">
+                <VBtn @click="updateForm" v-show="isUpdate">
                   Save
                 </VBtn>
               </VCardText>
@@ -133,7 +163,7 @@ onMounted(() => {
       <VDataTable :headers="headers" :items="data" :items-per-page="5" class="px-4 pb-3">
         <template #item.action="{ item }">
           <VBtn color="primary" class="me-2" @click="showDetail(item)">EDIT</VBtn>
-          <VBtn color="error">DELETE</VBtn>
+          <VBtn color="error" @click="deleteCol(item)">DELETE</VBtn>
         </template>
       </VDataTable>
     </VCard>
