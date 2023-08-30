@@ -1,8 +1,8 @@
 export interface BlogData {
   id: number
   title: string
-  description: string
   category: Category
+  description: string
 }
 
 export interface Category {
