@@ -9,13 +9,15 @@ const courses = ref([
 ])
 
 const isFormAddVisible = ref(false)
-const formTitle = ref('Add Course')
+const formTitle = ref('Edit Course')
 const courseName = ref('')
 const courseCategory = ref('')
+const courseSlug = ref('')
 const isSubmit = ref(false)
+const isUpdate = ref(false)
 
 const getCourses = async () => {
-  const res = await axios.get('/courses/course/all', {
+  const res = await axios.get('/course', {
     params: {
       page: 1,
       itemsPerPage: 5,
@@ -23,7 +25,7 @@ const getCourses = async () => {
   });
 
   // map res.data.courseData to courses.value with format like headers
-  courses.value = res.data.courseData.map((course: any, index: number) => ({
+  courses.value = res.data.map((course: any, index: number) => ({
     no: index + 1,
     title: course.title,
     category: course.category,
@@ -33,24 +35,38 @@ const getCourses = async () => {
 
 getCourses();
 
-const submitForm: any = async () => {
+const updateForm: any = async () => {
   isFormAddVisible.value = false
   isSubmit.value = true
 
   const payload = {
-    name: courseName.value
+    title: courseName.value
   }
 
   try {
-    const response = await axios.post('/courses/course/create', payload)
+    const response = await axios.patch(`/course/update/${courseSlug.value}`, payload)
+    if (response) {
+      window.location.href = '/course/list'
+    }
     // console.log(response)
   } catch (error) {
     console.log(error)
   } finally {
     isSubmit.value = false
+    isUpdate.value = false
   }
 }
 
+const deleteCol: any = async (param: any) => {
+  try {
+    const response = await axios.patch('/course/delete/' + param.columns.action)
+    if(response){
+      window.location.href = '/course/list'
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 const showDetail = async (course: any) => {
   const store = useCourseDetail();
@@ -58,12 +74,13 @@ const showDetail = async (course: any) => {
 
   isFormAddVisible.value = true;
 
-  // change form title
-  formTitle.value = 'Edit Course';
-
   // passing data to form
   courseName.value = course.title;
   courseCategory.value = course.category;
+
+  
+  isUpdate.value = true
+  courseSlug.value = course.columns.action
 };
 
 const headers = [
@@ -105,7 +122,7 @@ const headers = [
                 <VBtn variant="tonal" color="secondary" @click="isFormAddVisible = false">
                   Close
                 </VBtn>
-                <VBtn @click="submitForm">
+                <VBtn @click="updateForm" v-show="isUpdate">
                   Save
                 </VBtn>
               </VCardText>
@@ -117,7 +134,7 @@ const headers = [
       <VDataTable :headers="headers" :items="courses" :items-per-page="5" class="px-4 pb-3">
         <template #item.action="{ item }">
           <VBtn color="primary" class="me-2" @click="showDetail(item)">EDIT</VBtn>
-          <VBtn color="error">DELETE</VBtn>
+          <VBtn color="error" @click="deleteCol(item)">DELETE</VBtn>
         </template>
       </VDataTable>
     </VCard>
