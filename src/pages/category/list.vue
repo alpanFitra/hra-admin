@@ -21,22 +21,24 @@ const data = ref<CategoryData[]>([])
 const isFormAddVisible = ref(false)
 const formTitle = ref('Add Category')
 const categoryName = ref('')
+const categorySlug = ref('')
 const isSubmit = ref(false)
+const isUpdate = ref(false)
 
 const getCategories = async () => {
   try {
-    const response = await axios.get('/category/all', {
+    const response = await axios.get('/categories', {
       params: {
         page: 1,
         itemsPerPage: 5
       }
     })
-    response.data.categories.forEach((item: any, index: number) => {
+    response.data.forEach((item: any, index: number) => {
       data.value.push({
         no: index + 1,
         id: item.id,
         title: item.name,
-        action: item
+        action: item.slug
       })
     })
   } catch (error) {
@@ -53,12 +55,48 @@ const submitForm: any = async () => {
   }
 
   try {
-    const response = await axios.post('/category/create', payload)
+    const response = await axios.post('/categories/create', payload)
+    if (response) {
+      window.location.href = '/category/list'
+    }
     // console.log(response)
   } catch (error) {
     console.log(error)
   } finally {
     isSubmit.value = false
+  }
+}
+
+const updateForm: any = async () => {
+  isFormAddVisible.value = false
+  isSubmit.value = true
+
+  const payload = {
+    name: categoryName.value
+  }
+
+  try {
+    const response = await axios.patch(`/categories/update/${categorySlug.value}`, payload)
+    if (response) {
+      window.location.href = '/category/list'
+    }
+    // console.log(response)
+  } catch (error) {
+    console.log(error)
+  } finally {
+    isSubmit.value = false
+    isUpdate.value = false
+  }
+}
+
+const deleteCol: any = async (param: any) => {
+  try {
+    const response = await axios.patch('/categories/delete/' + param.columns.action)
+    if (response) {
+      window.location.href = '/category/list'
+    }
+  } catch (error) {
+    console.log(error);
   }
 }
 
@@ -73,6 +111,9 @@ const showDetail = async (item: any) => {
 
   // passing data to form
   categoryName.value = item.title;
+
+  isUpdate.value = true
+  categorySlug.value = item.columns.action
 };
 
 onMounted(() => {
@@ -111,7 +152,10 @@ onMounted(() => {
                 <VBtn variant="tonal" color="secondary" @click="isFormAddVisible = false">
                   Close
                 </VBtn>
-                <VBtn @click="submitForm">
+                <VBtn @click="submitForm" v-show="!isUpdate">
+                  Save
+                </VBtn>
+                <VBtn @click="updateForm" v-show="isUpdate">
                   Save
                 </VBtn>
               </VCardText>
@@ -129,8 +173,11 @@ onMounted(() => {
       </VCardTitle>
       <VDataTable :headers="headers" :items="data" :items-per-page="5" class="px-4 pb-3">
         <template #item.action="{ item }">
-          <VBtn color="primary" @click="showDetail(item)">
-            Edit
+          <VBtn color="primary" class="m-2 mr-2" @click="showDetail(item)">
+            EDIT
+          </VBtn>
+          <VBtn color="error" @click="deleteCol(item)">
+            DELETE
           </VBtn>
         </template>
       </VDataTable>
