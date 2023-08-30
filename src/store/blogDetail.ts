@@ -4,6 +4,7 @@ interface BlogDetail {
   id: string;
   title: string;
   category: string;
+  description: string;
 }
 
 export const useBlogDetail = defineStore({
@@ -12,6 +13,7 @@ export const useBlogDetail = defineStore({
     id: '',
     title: '',
     category: '',
+    description: '',
   }),
   getters: {
     getDetailBlog(): BlogDetail {
@@ -19,6 +21,7 @@ export const useBlogDetail = defineStore({
         id: this.id,
         title: this.title,
         category: this.category,
+        description: this.description,
       };
     },
   },
@@ -27,11 +30,13 @@ export const useBlogDetail = defineStore({
       id: string,
       title: string,
       category: string,
-      
+      description: string,
+
     ): void {
       this.id = id;
       this.title = title;
       this.category = category;
+      this.description = description;
     },
   },
 });
