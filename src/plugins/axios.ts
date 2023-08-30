@@ -2,7 +2,7 @@ import router from '@/router'
 import axios from 'axios'
 
 const axiosIns = axios.create({
-  baseURL: 'https://hraapi.rzkmlna.tech/api',
+  baseURL: 'https://apihra.rzkmlna.tech/api',
   headers: {
     'Authorization': 'Bearer ' + localStorage.getItem('hra-token'),
   },
