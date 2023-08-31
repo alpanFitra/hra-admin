@@ -36,6 +36,13 @@ const blogDescription = ref('')
 const isSubmit = ref(false)
 const isUpdate = ref(false)
 
+const categories = [
+  {
+    text: 'Category 1',
+    value: 1,
+  },
+]
+
 const getBlog = async () => {
   try {
     const response = await axios.get('/blog', {
@@ -141,7 +148,8 @@ onMounted(() => {
                 <VRow>
                   <VCol cols="12">
                     <AppTextField v-model="blogName" label="Title" />
-                    <AppSelect v-model="blogCategory" label="Category" />
+                    <AppSelect v-model="blogCategory" :items="categories" item-title="text" item-value="value" label="Categories"
+          persistent-hint return-object single-line />
                     <AppTextarea v-model="blogDescription" label="Description" />
                   </VCol>
                 </VRow>
